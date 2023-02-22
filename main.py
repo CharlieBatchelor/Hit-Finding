@@ -7,17 +7,18 @@ from basic_simulation_testing import *
 # Parameters ------------------------------------------------------
 threshold = 5  # Hit finding threshold on ADC
 down_sample_factor = 1  # Factor by which to reduce the information in waveform
-frugal_ped_ncontig = 15  # Number of samples to consider before adjusting median in ped finding
+frugal_ped_ncontig = 5  # Number of samples to consider before adjusting median in ped finding
 use_sigkill = False  # Implement this later
 do_filtering = True  # Boolean, for deciding whether we do filtering
 filter_taps = [1, 3, 6, 9, 6, 3, 1]  # FIR Taps - Need tuning
 
 # Basic simulation testing ----------------------------------------
-n = 10000                       # Scale/size of simulated waveform
+n = 500                       # Scale/size of simulated waveform
 x = np.linspace(0, n, n)        # Default size of sim waveform
 n_waveforms = 10                # Default number of waveforms to make
 use_simulation = True           # Only doing simulation for now
 plotting_waveform = 0           # Test waveform to plot relevant data
+use_random_walk = True        # It's random walk or noisy sine wave
 
 
 # Algorithm functions ---------------------------------------------
@@ -144,15 +145,28 @@ if __name__ == '__main__':
         test_waveforms = []
         channels = []
         for i in range(0, n_waveforms):
-            test_waveforms.append(sim_waveform(x))
+            if use_random_walk:
+                test_waveforms.append(sim_waveform(x))
+            else:
+                test_waveforms.append(sin_waveform(x))
             channels.append(i)
 
         hits = find_hits(channels, test_waveforms)
     # === TESTING Complete - Now plot a sample waveform and data ========
-        plt.plot(test_waveforms[0], label="Example Simulated Waveform")
-        plt.plot(find_pedestal(test_waveforms[0]), label="Found Pedestal")
-        plt.title("Simulated Waveform Example")
-        plt.xlabel("Relative Time Tick")
-        plt.ylabel("Arbitrary ADC Value")
+        # Get ped sub for sample waveform
+        tw = test_waveforms[plotting_waveform]
+        ped = find_pedestal(tw)
+        pedsub = []
+        for j, adc in enumerate(tw):
+            pedsub.append(adc - ped[j])
+
+        plt.plot(tw, label="Raw Simulated Waveform")
+        plt.plot(find_pedestal(tw), label="Found Pedestal - Raw")
+        plt.plot(pedsub, label="Pedestal Subtracted Waveform")
+        plt.plot(find_pedestal(pedsub), label="Found Pedestal - Ped Subtracted")
+        plt.grid()
+        plt.title("Simulated Waveform Example", fontweight='bold')
+        plt.xlabel("Relative Time Tick", fontweight='bold')
+        plt.ylabel("Arbitrary ADC Value", fontweight='bold')
         plt.legend()
         plt.show()
