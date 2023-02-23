@@ -23,7 +23,7 @@ use_random_walk = True          # It's random walk or noisy sine wave
 
 # Data testing ----------------------------------------------------
 use_data = True
-num_forms = 2                   # Number of waveforms to run hit finding on
+num_forms = 5                   # Number of waveforms to run hit finding on
 
 # Plotting parameters ---------------------------------------------
 plotting = True
