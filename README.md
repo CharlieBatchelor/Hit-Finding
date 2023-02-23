@@ -6,7 +6,7 @@ A generic hit finding application that currently accepts streams of raw ADC info
 2. Does basic pedestal finding and subtraction on the raw waveform.
 3. Applies a simple Finite-Impulse-Response (FIR) filter to the waveform.
 4. The result of passing the raw waveform through the sequence above is passed to the `hit_finding()` function, which returns a list of hits for each channel.
-
+5. All of the above is handled by the function `find_hits()` in the main script. It returns a collection of lists of hits, one for each pseudochannel passed.
 
 ## Basic Simulation Test
 

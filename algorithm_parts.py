@@ -8,6 +8,25 @@ class Hit:
         self.time_over_threshold = 0
 
 
+def frugal_iqr(waveform, pedestal, frugal_ncontig):
+    iqr = [0]*len(waveform)
+
+    rd_lo = 0
+    rd_hi = 0
+    q_lo = pedestal[0]-1
+    q_hi = pedestal[0]+1
+
+    for i, s in enumerate(waveform):
+        if s < pedestal[i]:
+            q_lo, rd_lo = do_frugal_update(q_lo, rd_lo, s, frugal_ncontig)
+        if s > pedestal[i]:
+            q_hi, rd_hi = do_frugal_update(q_hi, rd_hi, s, frugal_ncontig)
+
+        iqr[i] = q_hi - q_lo
+
+    return iqr
+
+
 # Find and return the frugal pedestal of the raw waveform. This corresponds to
 # an adapting pedestal along the waveform, of size waveform.size
 def frugal_pedestal(waveform, ncontig):

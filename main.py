@@ -27,6 +27,7 @@ num_forms = 2                   # Number of waveforms to run hit finding on
 
 # Plotting parameters ---------------------------------------------
 plotting = True
+fontsize = 20
 
 
 # Algorithm functions ---------------------------------------------
@@ -118,19 +119,23 @@ if __name__ == '__main__':
         if plotting:
             # Setup subplots
             fig, axs = plt.subplots(num_forms, 1, sharex=True, sharey=True)
-            fig.supxlabel("Relative Time - Ticks", fontweight="bold")
-            fig.supylabel("ADC Count", fontweight="bold")
-            fig.suptitle("Raw DAPHNE Waveforms - PROCESSED_CALIB_WVFS_SC.npy", fontweight="bold")
+            fig.supxlabel("Relative Time - Ticks", fontweight="bold", fontsize=fontsize-5)
+            fig.supylabel("ADC Count", fontweight="bold", fontsize=fontsize-5)
+            fig.suptitle("Raw DAPHNE Waveforms - PROCESSED_CALIB_WVFS_SC.npy", fontweight="bold", fontsize=fontsize)
             axs.ravel()
 
             for i in range(0, num_forms):
+                pedestal = find_pedestal(wfs[i], use_sigkill, frugal_ped_ncontig)
+                iqr = frugal_iqr(wfs[i], pedestal, frugal_ped_ncontig)
                 label = "Raw Waveform: " + str(i+1)
+
                 axs[i].plot(wfs[i], label=label)
-                axs[i].plot(find_pedestal(wfs[i], use_sigkill, frugal_ped_ncontig), label="Pedestal")
+                axs[i].plot(pedestal, label="Pedestal")
+                axs[i].plot(iqr, label="Running Inter Quartile Range ~ Threshold Estimate")
                 axs[i].grid('both')
                 axs[i].legend()
-                axs[i].set_xlabel("Relative Time Tick", fontweight='bold')
-                axs[i].set_ylabel("Arbitrary ADC Value", fontweight='bold')
+                # axs[i].set_xlabel("Relative Time Tick", fontweight='bold')
+                # axs[i].set_ylabel("Arbitrary ADC Value", fontweight='bold')
 
             plt.show()
 
