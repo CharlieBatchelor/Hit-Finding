@@ -20,5 +20,5 @@ An example of a raw waveform, it's calculated pedestal, the pedestal subtracted 
 
 The DAPHNE boards will provide the hits to the DUNE DAQ software. For now, we can process the sample waveforms to do some simple hit finding and use these to pass to the trigger stream in DUNE DAQ offline, for PDS trigger stream testing. Going by the following figure, we still need to introduce the `signal_kill` and IQ ranges found to estimate the variance which informs the hit finding ADC threshold parameter.
 
-![This is an image](/images/daphne_waveforms.png)
+![This is an image](/images/daphne_waveforms_visual.png)
 
