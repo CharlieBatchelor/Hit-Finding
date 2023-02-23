@@ -8,6 +8,19 @@ class Hit:
         self.time_over_threshold = 0
 
 
+# Class which matches the structure of a DUNE DAQ TP
+class TP:
+    def __init__(self):
+        self.start_time = 0            # Start time
+        self.time_over_threshold = 0   # Time over ADC threshold
+        self.peak_time = 0             # Time of peak ADC value
+        self.channel = 0               # Offline ADC Channel ID (Wire/Strip)
+        self.sum_charge = 0            # ADC Integral of hit
+        self.peak_charge = 0           # Highest ADC value of hit
+        self.det_id = 0                # Detector Unit ID
+        self.type = 0                  # 0:Unknown 1:TPC or 2:PDS
+
+
 def frugal_iqr(waveform, pedestal, frugal_ncontig):
     iqr = [0]*len(waveform)
 

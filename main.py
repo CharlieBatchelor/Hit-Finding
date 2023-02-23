@@ -6,12 +6,12 @@ from basic_simulation_testing import *
 import json
 
 # Parameters ------------------------------------------------------
-threshold = 100           # Hit finding threshold on ADC
+threshold = 100           # Hit finding threshold on ADC - Use IQR instead?
 down_sample_factor = 1    # Factor by which to reduce the information in waveform
-frugal_ped_ncontig = 5    # Number of samples to consider before adjusting median in ped finding
+frugal_ped_ncontig = 3    # Number of samples to consider before adjusting median in ped finding
 use_sigkill = False       # Implement this later
 do_filtering = True       # Boolean, for deciding whether we do filter
-filter_taps = [1, 3, 6, 9, 6, 3, 1]  # FIR Taps - Need tuning
+filter_taps = [1, 5, 20, 30, 20, 5, 1]  # FIR Taps - Need tuning
 
 # Basic simulation testing ----------------------------------------
 n = 500                         # Scale/size of simulated waveform
@@ -23,10 +23,10 @@ use_random_walk = True          # It's random walk or noisy sine wave
 
 # Data testing ----------------------------------------------------
 use_data = True
-num_forms = 5                   # Number of waveforms to run hit finding on
+num_forms = 2                   # Number of waveforms to run hit finding on
 
 # Plotting parameters ---------------------------------------------
-plotting = True
+plotting = False
 fontsize = 20
 
 
