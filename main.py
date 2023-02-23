@@ -11,7 +11,8 @@ down_sample_factor = 1    # Factor by which to reduce the information in wavefor
 frugal_ped_ncontig = 3    # Number of samples to consider before adjusting median in ped finding
 use_sigkill = False       # Implement this later
 do_filtering = True       # Boolean, for deciding whether we do filter
-filter_taps = [1, 5, 20, 30, 20, 5, 1]  # FIR Taps - Need tuning
+use_iqr_threshold = True  # Use the interquartile range as threshold for hit finding
+filter_taps = [1, 2, 6, 8, 6, 2, 1]  # FIR Taps - Need tuning
 
 # Basic simulation testing ----------------------------------------
 n = 500                         # Scale/size of simulated waveform
@@ -24,9 +25,10 @@ use_random_walk = True          # It's random walk or noisy sine wave
 # Data testing ----------------------------------------------------
 use_data = True
 num_forms = 2                   # Number of waveforms to run hit finding on
+hit_type = 2                    # 0: unknown, 1: TPC, 2: PDS
 
 # Plotting parameters ---------------------------------------------
-plotting = False
+plotting = True
 fontsize = 20
 
 
@@ -39,6 +41,7 @@ def print_config():
     print("Use Signal Kill? ", use_sigkill)
     print("Using filtering: ", do_filtering)
     print("Filter taps: ", filter_taps)
+    print("Type of threshold: ", type(threshold))
     print()
 
 
@@ -54,9 +57,12 @@ def find_hits(channels, samples):
         pedsub = []
         for j, adc in enumerate(waveform):
             pedsub.append(adc - pedestal[j])
-
         filtered = filter(pedsub, filter_taps, do_filtering)
-        hits.append(hit_finding(filtered, channels[i], down_sample_factor, threshold))
+        if use_iqr_threshold:
+            pedestal = find_pedestal(waveform, use_sigkill, frugal_ped_ncontig)
+            iqr_threshold = frugal_iqr(filtered, pedestal, frugal_ped_ncontig)
+
+        hits.append(hit_finding(filtered, channels[i], down_sample_factor, iqr_threshold, hit_type))
 
     print("Hit finding complete, returning ", len(hits[0]), " hits for first channel.")
     print("Returning total of ", len(hits), " lists of hits, should be one for each channel.")
@@ -127,11 +133,21 @@ if __name__ == '__main__':
             for i in range(0, num_forms):
                 pedestal = find_pedestal(wfs[i], use_sigkill, frugal_ped_ncontig)
                 iqr = frugal_iqr(wfs[i], pedestal, frugal_ped_ncontig)
+                pedsub = []
+                for j, adc in enumerate(wfs[i]):
+                    pedsub.append(adc - pedestal[j])
+                filtered = filter(pedsub, filter_taps, do_filtering)
+                filtered_pedestal = frugal_pedestal(filtered, frugal_ped_ncontig)
+                iqr_filtered = frugal_iqr(filtered, filtered_pedestal, frugal_ped_ncontig)
+                iqr_threshold = [i * 3 for i in iqr_filtered]
+
                 label = "Raw Waveform: " + str(i+1)
 
-                axs[i].plot(wfs[i], label=label)
-                axs[i].plot(pedestal, label="Pedestal")
-                axs[i].plot(iqr, label="Running Inter Quartile Range ~ Threshold Estimate")
+                # axs[i].plot(wfs[i], label=label)
+                # axs[i].plot(pedestal, label="Pedestal")
+                # axs[i].plot(iqr, label="Running Inter Quartile Range ~ Threshold Estimate")
+                axs[i].plot(filtered, label="Filtered")
+                axs[i].plot(iqr_threshold, label="Filtered IQR Doubled - Hit threshold")
                 axs[i].grid('both')
                 axs[i].legend()
                 # axs[i].set_xlabel("Relative Time Tick", fontweight='bold')
