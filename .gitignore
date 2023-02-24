@@ -1,0 +1,5 @@
+# ignore config file contents
+config.json
+
+# ignore all files in the output dir
+output/

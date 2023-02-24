@@ -17,7 +17,7 @@ filter_taps = [1, 2, 6, 8, 6, 2, 1]  # FIR Taps - Need tuning
 # Basic Simulation Testing Parameters ------------------------------
 n = 500                         # Scale/size of simulated waveform
 x = np.linspace(0, n, n)        # Default size of sim waveform
-n_waveforms = 10                # Default number of waveforms to make
+n_waveforms = 1000                # Default number of waveforms to make
 use_simulation = False          # Only doing simulation for now
 plotting_waveform = 0           # Test waveform to plot relevant data
 use_random_walk = True          # It's random walk or noisy sine wave
@@ -127,10 +127,12 @@ if __name__ == '__main__':
             file = out_loc + out_file
             write_tps_to_file(file, hits)
 
-
-
         # Plot some DAPHNE data
         if plotting:
+            # If hit finding on all forms, just plot a few
+            if num_forms > 5:
+                num_forms = 3
+
             # Setup subplots
             fig, axs = plt.subplots(num_forms, 1, sharex=True, sharey=True)
             fig.supxlabel("Relative Time - Ticks", fontweight="bold", fontsize=fontsize-5)
