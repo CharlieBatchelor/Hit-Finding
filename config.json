@@ -1,4 +1,4 @@
 {
-  "data_location": "/Users/s2112263/PycharmProjects/sample_pds_data/PROCESSED_CALIB_WVFS_SC.npy",
-  "output_location": "/Users/s2112263/PycharmProjects/pdsHitFinding/output/tps/"
+  "data_location": "/path/to/your/input/file",
+  "output_location": "/path/to/output/dir"
 }
