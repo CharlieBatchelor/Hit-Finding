@@ -1,11 +1,24 @@
 # Simple hit class - has all the information to generate hits to play in DUNE DAQ
 class Hit:
-    def __init__(self, channel, start_time, peak_charge, sum_charge, time_over_threshold):
+    def __init__(self):
         self.channel = 0
         self.start_time = 0
         self.peak_charge = 0
         self.sum_charge = 0
         self.time_over_threshold = 0
+
+
+# Class which matches the structure of a DUNE DAQ TP
+class TP:
+    def __init__(self):
+        self.start_time = 0            # Start time
+        self.time_over_threshold = 0   # Time over ADC threshold
+        self.peak_time = 0             # Time of peak ADC value
+        self.channel = 0               # Offline ADC Channel ID (Wire/Strip)
+        self.sum_charge = 0            # ADC Integral of hit
+        self.peak_charge = 0           # Highest ADC value of hit
+        self.det_id = 0                # Detector Unit ID
+        self.type = 0                  # 0:Unknown 1:TPC or 2:PDS
 
 
 def frugal_iqr(waveform, pedestal, frugal_ncontig):
@@ -109,35 +122,45 @@ def filter(pedsub, filter_taps, do_filtering):
 
 
 # Does the hit finding for specified channel and returns list of hits
-def hit_finding(waveform, channel, down_sample_factor, threshold):
+def hit_finding(waveform, channel, down_sample_factor, threshold, type):
     is_hit = False
     was_hit = False
-    hit = Hit(channel, 0, 0, 0, 0)
+    hit = Hit()
+    hit = TP()
+    hit.channel = channel
     hit_charge = []
+    hit_time = []
     hits = []
 
     for i, s in enumerate(waveform):
         sample_time = i * down_sample_factor
         adc = s
 
+        # Ignore first 500 ticks for pedestal to stabalise
+        if i < 500: continue
+
         # Introduce ignorance of first ~100 ticks for pedestal to stabalise
-        is_hit = adc > threshold
+        is_hit = adc > 3*threshold[i]
         if is_hit and not was_hit:
             # Starting a hit, set start time:
             hit_charge.append(adc)
+            hit_time.append(i)
             hit.start_time = sample_time
             hit.sum_charge = adc
             hit.time_over_threshold = down_sample_factor
         if is_hit and was_hit:
             # Continuing a hit, add stuff
             hit_charge.append(adc)
+            hit_time.append(i)
             hit.sum_charge += adc * down_sample_factor
             hit.time_over_threshold += down_sample_factor
         if not is_hit and was_hit:
             # The hit is finished, output it.
             hit.peak_charge = max(hit_charge)
+            hit.peak_time = hit_time[hit_charge.index(max(hit_charge))]
             hits.append(hit)
             hit_charge.clear()
+            hit_time.clear()
         was_hit = is_hit
 
     return hits
