@@ -5,7 +5,7 @@ from algorithm_parts import *
 from basic_simulation_testing import *
 import json
 
-# Parameters ------------------------------------------------------
+# Hit Finding Parameters -------------------------------------------
 threshold = 100           # Hit finding threshold on ADC - Use IQR instead?
 down_sample_factor = 1    # Factor by which to reduce the information in waveform
 frugal_ped_ncontig = 3    # Number of samples to consider before adjusting median in ped finding
@@ -14,7 +14,7 @@ do_filtering = True       # Boolean, for deciding whether we do filter
 use_iqr_threshold = True  # Use the interquartile range as threshold for hit finding
 filter_taps = [1, 2, 6, 8, 6, 2, 1]  # FIR Taps - Need tuning
 
-# Basic simulation testing ----------------------------------------
+# Basic Simulation Testing Parameters ------------------------------
 n = 500                         # Scale/size of simulated waveform
 x = np.linspace(0, n, n)        # Default size of sim waveform
 n_waveforms = 10                # Default number of waveforms to make
@@ -22,15 +22,16 @@ use_simulation = False          # Only doing simulation for now
 plotting_waveform = 0           # Test waveform to plot relevant data
 use_random_walk = True          # It's random walk or noisy sine wave
 
-# Data testing ----------------------------------------------------
+# Data Testing ----------------------------------------------------
 use_data = True
-num_forms = 2                   # Number of waveforms to run hit finding on
+num_forms = 100                   # Number of waveforms to run hit finding on
 hit_type = 2                    # 0: unknown, 1: TPC, 2: PDS
 
-# Plotting parameters ---------------------------------------------
-plotting = True
+# Plotting & Output Parameters ---------------------------------------------
+plotting = False
 fontsize = 20
-
+write_out_tps = True
+out_file = "output_tps.txt"
 
 # Algorithm functions ---------------------------------------------
 def print_config():
@@ -112,6 +113,7 @@ if __name__ == '__main__':
         file = open('config.json')
         config = json.load(file)
         data_loc = config['data_location']
+        out_loc = config['output_location']
         daphne_data = np.load(data_loc)
         print("Shape of full DAPHNE dataframe: ", daphne_data.shape)
         wfs = daphne_data[:num_forms]
@@ -120,6 +122,12 @@ if __name__ == '__main__':
 
         # Do the hit finding on these waveforms separately
         hits = find_hits(channels, wfs)
+
+        if write_out_tps:
+            file = out_loc + out_file
+            write_tps_to_file(file, hits)
+
+
 
         # Plot some DAPHNE data
         if plotting:

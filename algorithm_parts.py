@@ -1,6 +1,6 @@
 # Simple hit class - has all the information to generate hits to play in DUNE DAQ
 class Hit:
-    def __init__(self, channel, start_time, peak_charge, sum_charge, time_over_threshold):
+    def __init__(self):
         self.channel = 0
         self.start_time = 0
         self.peak_charge = 0
@@ -10,7 +10,7 @@ class Hit:
 
 # Class which matches the structure of a DUNE DAQ TP
 class TP:
-    def __init__(self, start_time, time_over_threshold, peak_time, channel, sum_charge, peak_charge, det_id, type):
+    def __init__(self):
         self.start_time = 0            # Start time
         self.time_over_threshold = 0   # Time over ADC threshold
         self.peak_time = 0             # Time of peak ADC value
@@ -125,8 +125,9 @@ def filter(pedsub, filter_taps, do_filtering):
 def hit_finding(waveform, channel, down_sample_factor, threshold, type):
     is_hit = False
     was_hit = False
-    hit = Hit(channel, 0, 0, 0, 0)
-    hit = TP(0, 0, 0, channel, 0, 0, 1, type)
+    hit = Hit()
+    hit = TP()
+    hit.channel = channel
     hit_charge = []
     hit_time = []
     hits = []
